@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Ip;
 use App\Role;
 use App\User;
+use Avatar;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

@@ -2,6 +2,18 @@
 
 {{ Form::hidden('id', $user->id) }}
 
+<div class="row mb-5">
+    <div class="col-lg-6">
+        <dl class="row list-detail">
+            <dt class="col-sm-6">{{ __('Дата реєстрації:') }}</dt>
+            <dd class="col-sm-6">{{ $user->created_at->format('d.m.Y H:i:s') }}</dd>
+
+            <dt class="col-sm-6">{{ __('Поточний статус:') }}</dt>
+            <dd class="col-sm-6">{!! \App\User::htmlStatuses()[$user->status] !!}</dd>
+        </dl>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-6">
         <div class="form-group">
@@ -48,6 +60,7 @@
             @endif
         </div>
     </div>
+
     <div class="col-lg-6">
         <div class="form-group">
             <label>{{ __('Пароль:') }}</label>
