@@ -106,7 +106,7 @@
         <div class="form-group">
             <label>{{ __('Артікул:') }}</label>
 
-            {{ Form::text('sku', $product->slug, [
+            {{ Form::text('sku', $product->sku, [
                 'class' => $errors->has('sku') ? 'form-control is-invalid' : 'form-control'
             ]) }}
 

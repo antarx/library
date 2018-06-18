@@ -15,7 +15,7 @@ class Product extends Model
     ];
 
     protected $fillable = [
-        'name', 'h1', 'slug', 'text', 'image', 'file', 'meta_title', 'meta_description', 'meta_keywords', 'sort_order', 'status'
+        'name', 'h1', 'slug', 'text', 'sku', 'image', 'file', 'meta_title', 'meta_description', 'meta_keywords', 'sort_order', 'status'
     ];
 
     public static function statuses()
