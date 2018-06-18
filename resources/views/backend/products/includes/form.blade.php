@@ -140,34 +140,64 @@
         </div>
 
         <div class="form-group">
+            <label>{{ __('Файл:') }}</label>
+
+            <div class="input-group">
+                {{ Form::text('file', request()->old('file') ?? $product->file, [
+                    'class' => 'form-control',
+                    'placeholder' => __('Обрати файл...')
+                ]) }}
+
+                <span class="input-group-append">
+                    <button class="btn btn-primary btn-filemanager-open" type="button" data-mime-types="">
+                        <i class="la la-file"></i>
+                        {{ __('Обрати') }}
+                    </button>
+                </span>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label>{{ __('Зображення:') }}</label>
 
-            <figure></figure>
+            <figure>
+                @if(request()->old('image') || $product->image)
+                    <img class="img-fluid" src="{{ request()->old('image') ?? $product->image }}" />
+                @endif
+            </figure>
 
-            <button class="btn btn-primary btn-filemanager" type="button">
+            <button class="btn btn-primary btn-filemanager-open" type="button" data-mime-types="image">
                 <i class="la la-photo"></i>
-                {{ __('Вибрати') }}
+                {{ __('Обрати') }}
             </button>
+
+            <button class="btn btn-danger btn-remove {{ request()->old('image') || $product->image ? '' : 'd-none' }}" type="button">
+                <i class="la la-remove"></i>
+                {{ __('Видалити') }}
+            </button>
+
+            {{ Form::hidden('image', request()->old('image') ?? $product->image) }}
         </div>
     </div>
 </div>
 
 {{ Form::close() }}
 
-<div id="modal-filemanager" class="filemanager">
-    <div class="filemanager-header">
-        <h4 class="heading-title">
-            {{ __('Файловий менеджер') }}
-        </h4>
+<div class="modal fade" id="modal-filemanager" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    {{ __('Обрати файл') }}
+                </h3>
 
-        <button type="button" class="close" data-dismiss="filemanager" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
     </div>
-    <div class="filemanager-body">
-        <filemanager-component></filemanager-component>
-    </div>
-    <div class="filemanager-footer"></div>
 </div>
 
 @push('styles')
@@ -186,27 +216,71 @@
 
             $('.select2').select2();
 
-            $('.btn-filemanager').on('click', function () {
-                filemanager.init();
+            var data = {
+                modal: 1,
+                page: 1,
+                mime_types: '',
+                per_page: 18
+            };
 
-                $('#modal-filemanager').addClass('active');
-                $('body').css('overflow-y', 'hidden');
+            $('.btn-filemanager-open').on('click', function (e) {
+                e.preventDefault();
+
+                data.mime_types = $(this).data('mime-types');
+
+                getResponse('{{ route('admin.filemanager.index') }}', data, true);
             });
 
-            $('button[data-dismiss="filemanager"]').on('click', function () {
-                $('#modal-filemanager').removeClass('active');
-                $('body').css('overflow-y', 'auto');
+            $('.btn-remove').on('click', function (e) {
+                e.preventDefault();
+
+                $('#form-edit').find('figure').html('');
+                $('.btn-filemanager-remove').addClass('d-none');
             });
 
-            var filemanager = {
-                data: {
-                    page: 1
-                },
-                init: function () {
-                    $.get('{{ route('admin.filemanager.index') }}', filemanager.data, function (response) {
-                        $('.filemanager-body').html(response);
-                    });
+            $('#modal-filemanager').on('click', '.page-item:not(.active) .page-link', function (e) {
+                e.preventDefault();
+
+                getResponse($(this).attr('href'), null, false);
+            });
+
+            $('#modal-filemanager').on('click', '.directory a', function (e) {
+                e.preventDefault();
+
+                getResponse($(this).attr('href'), data, false);
+            });
+
+            $('#modal-filemanager').on('click', '.file a', function (e) {
+                e.preventDefault();
+
+                var target = $(this).attr('href');
+
+                if (data.mime_types == 'image') {
+                    $('#form-edit').find('figure').html('<img class="img-fluid" src="' + target + '" />');
+                    $('#form-edit').find('input[name="image"]').val(target);
+
+                    $('.btn-filemanager-remove').removeClass('d-none');
+                } else {
+                    $('#form-edit').find('input[name="file"]').val(target);
                 }
+
+                $('#modal-filemanager').modal('hide');
+            });
+
+            $('#modal-filemanager').on('click', '.back a', function (e) {
+                e.preventDefault();
+
+                getResponse($(this).attr('href'), data, false);
+            });
+
+            function getResponse(url, data, showModal) {
+                $.get(url, data, function (response) {
+                    $('#modal-filemanager .modal-body').html(response);
+
+                    if (showModal) {
+                        $('#modal-filemanager').modal('show');
+                    }
+                });
             }
         });
     </script>

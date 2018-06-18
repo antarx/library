@@ -8,8 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class FileManagerController extends Controller
 {
-    protected $perPage = 30;
-
+    protected $template = 'backend.filemanager.includes.filemanager';
     /**
      * Display a listing of the resource.
      *
@@ -21,15 +20,20 @@ class FileManagerController extends Controller
     public function index(Request $request, DirectoryController $directory, FileController $file)
     {
         $path = $request->get('path', null);
-
         $currentPage = $request->get('page', 1);
+        $perPage = $request->get('per_page', 30);
+        $modal = $request->get('modal', 0);
+        $mime_types = $request->mime_types
+            ? config('filemanager.' . $request->mime_types)
+            : config('filemanager.mime_types');
 
-        $collection = collect(array_merge($directory->all($path), $file->all($path)));
+
+        $collection = collect(array_merge($directory->all($path), $file->all($path, $mime_types)));
 
         $pagination = new LengthAwarePaginator(
-            $collection->slice(($currentPage - 1) * $this->perPage, $this->perPage)->all(),
+            $collection->slice(($currentPage - 1) * $perPage, $perPage)->all(),
             $collection->count(),
-            $this->perPage,
+            $perPage,
             LengthAwarePaginator::resolveCurrentPage(),
             [
                 'path' => $request->url(),
@@ -37,10 +41,15 @@ class FileManagerController extends Controller
             ]
         );
 
-        return view('backend.filemanager.index', [
+        if (!$modal) {
+            $this->template = 'backend.filemanager.index';
+        }
+
+        return view($this->template, [
             'items'          => $pagination,
             'isSubDirectory' => $path ? 1 : 0,
-            'back'           => $this->backUrl($path)
+            'back'           => $this->backUrl($path),
+            'modal'          => $modal
         ]);
     }
 

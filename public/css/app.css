@@ -193,34 +193,6 @@ textarea.form-control {
   cursor: pointer;
 }
 
-#modal-filemanager {
-  display: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: #fff;
-  z-index: 999;
-}
-
-#modal-filemanager.active {
-  display: block;
-}
-
-.filemanager-header {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  padding: 1rem;
-}
-
 .modal-content {
   border-radius: 0;
   border-color: transparent;
@@ -229,6 +201,16 @@ textarea.form-control {
 .modal-header,
 .modal-footer {
   border: none;
+}
+
+#modal-filemanager .modal-content {
+  padding: 1rem;
+}
+
+@media (min-width: 1200px) {
+  .modal-lg {
+    max-width: 1100px;
+  }
 }
 
 .la {

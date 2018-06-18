@@ -14,23 +14,28 @@ class FileController extends Controller
      * @param $path
      * @return array
      */
-    public function all($path)
+    public function all($path, $mime_types)
     {
-        return array_map(function ($file) use ($path) {
+        $results = array_map(
+            function ($file) use ($path, $mime_types) {
                 $extension = $this->getExtension($file);
 
-                return collect([
-                    'url'       => $this->getUrl($file),
-                    'name'      => $this->getName($file),
-                    'extension' => $extension,
-                    'type'      => $this->getType($extension),
-                    'image'     => $this->isImage($extension)
-                        ? $this->getImagePath($file)
-                        : $this->getIcon($extension)
-                ]);
+                if (in_array($extension, $mime_types)) {
+                    return collect([
+                        'url'       => $this->getUrl($file),
+                        'name'      => $this->getName($file),
+                        'extension' => $extension,
+                        'type'      => $this->getType($extension),
+                        'image'     => $this->isImage($extension)
+                            ? $this->getImagePath($file)
+                            : $this->getIcon($extension)
+                    ]);
+                }
             },
             Storage::disk('uploads')->files($path)
         );
+
+        return array_filter($results);
     }
 
     /**
