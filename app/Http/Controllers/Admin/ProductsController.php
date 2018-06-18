@@ -169,6 +169,7 @@ class ProductsController extends Controller
         $this->validate($request, [
             'name'       => 'required|string|max:255',
             'slug'       => 'required|string|max:255',
+            'sku'        => 'max:255',
             'meta_title' => 'required|string|max:255'
         ]);
     }
